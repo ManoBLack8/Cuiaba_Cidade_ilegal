@@ -1,0 +1,1536 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cuiabá Cidade Ilegal — Reportagem experimental sobre direito à moradia</title>
+  <style>
+    /* ===== RESET E VARIÁVEIS ===== */
+    :root {
+      --vermelho: #e21f1f;
+      --laranja: #f08a00;
+      --marrom: #9c5b3c;
+      --creme: #fdf6ec;
+      --tinta: #1a0f0a;
+      --serif: 'Source Serif 4', 'Georgia', serif;
+      --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --transition: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html {
+      scroll-behavior: smooth;
+    }
+    body {
+      font-family: var(--sans);
+      color: #fff;
+      background: var(--creme);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    img {
+      max-width: 100%;
+      display: block;
+    }
+    .wrap {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 0 32px;
+    }
+
+    /* ===== BARRA DE PROGRESSO ===== */
+    .progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--laranja), var(--vermelho));
+      z-index: 1000;
+      width: 0%;
+      transition: width 0.1s linear;
+      box-shadow: 0 2px 10px rgba(226, 31, 31, 0.4);
+    }
+
+    /* ===== MENU DE NAVEGAÇÃO ===== */
+    .nav-float {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 999;
+      align-items: flex-end;
+    }
+    .nav-btn {
+      background: rgba(20, 20, 20, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 50px;
+      cursor: pointer;
+      font-family: var(--sans);
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      transition: all var(--transition);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: none;
+    }
+    .nav-btn:hover {
+      transform: translateY(-3px) scale(1.04);
+      background: rgba(40, 40, 40, 0.95);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+    }
+    .nav-btn .icon {
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+    .nav-btn .label {
+      display: inline-block;
+    }
+    .nav-btn .shortcut {
+      font-size: 0.65rem;
+      opacity: 0.5;
+      font-weight: 400;
+    }
+    .nav-indicator {
+      background: rgba(20, 20, 20, 0.7);
+      backdrop-filter: blur(8px);
+      border-radius: 30px;
+      padding: 6px 16px;
+      font-size: 0.7rem;
+      color: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-weight: 500;
+      letter-spacing: 0.3px;
+    }
+    .nav-indicator span {
+      color: #fff;
+      font-weight: 700;
+    }
+
+    /* ===== BOTÃO DE MODO LEITURA ===== */
+    .read-mode-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      background: rgba(20, 20, 20, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #fff;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: all var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      border: none;
+    }
+    .read-mode-toggle:hover {
+      transform: scale(1.1);
+      background: rgba(40, 40, 40, 0.9);
+    }
+    .read-mode-toggle.active {
+      background: var(--laranja);
+      box-shadow: 0 4px 20px rgba(240, 138, 0, 0.4);
+    }
+    body.read-mode .section-bg {
+      filter: brightness(0.85) saturate(0.6);
+    }
+    body.read-mode .wrap {
+      max-width: 700px;
+    }
+    body.read-mode .hero-map {
+      opacity: 0.2;
+    }
+    body.read-mode .nav-btn {
+      background: rgba(0, 0, 0, 0.8);
+    }
+
+    /* ===== HERO ===== */
+    .hero {
+      position: relative;
+      background: var(--vermelho);
+      overflow: hidden;
+      padding-bottom: 40px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .hero-map {
+      position: absolute;
+      inset: 0;
+      opacity: 0.4;
+      mix-blend-mode: overlay;
+      pointer-events: none;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.1s ease, opacity 0.6s ease;
+    }
+    .hero-inner {
+      position: relative;
+      z-index: 2;
+      padding: 80px 32px 40px;
+      max-width: 920px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .hero-eyebrow {
+      font-family: var(--serif);
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 300;
+      letter-spacing: 0.5px;
+      margin: 0;
+      color: #ffe3d8;
+      animation: fadeInUp 0.8s ease 0.2s both;
+    }
+    .hero-title {
+      font-family: var(--serif);
+      font-size: clamp(3rem, 9vw, 5.6rem);
+      font-weight: 800;
+      line-height: 0.95;
+      margin: 4px 0 28px;
+      color: #fff;
+      animation: fadeInDown 0.8s ease;
+    }
+    .hero-title .highlight {
+      background: linear-gradient(120deg, #ffd700, #ff8c00);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-sub {
+      display: inline-block;
+      background: #fff;
+      color: var(--vermelho);
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: lowercase;
+      font-size: 0.85rem;
+      padding: 14px 22px;
+      animation: fadeInUp 0.8s ease 0.4s both;
+      border-radius: 2px;
+    }
+
+    /* ===== LAYOUT DA INTRODUÇÃO ===== */
+    .hero-content {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 48px;
+      position: relative;
+      z-index: 2;
+      padding-top: 30px;
+      max-width: 920px;
+      margin: 0 auto;
+      padding-left: 32px;
+      padding-right: 32px;
+    }
+    .hero-text {
+      grid-column: 2 / 3;
+    }
+    .hero-colagem {
+      grid-column: 1 / 2;
+      grid-row: 1 / 2;
+      align-self: start;
+      margin-top: 10px;
+    }
+    .hero-colagem .placeholder {
+      border: 2px dashed rgba(255, 255, 255, 0.5);
+      padding: 24px 16px;
+      text-align: center;
+      font-style: italic;
+      font-size: 0.9rem;
+      opacity: 0.9;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(4px);
+      transition: all var(--transition);
+      cursor: default;
+      min-height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1.6;
+    }
+    .hero-colagem .placeholder:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateY(-4px) scale(1.01);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+      border-color: rgba(255, 255, 255, 0.8);
+    }
+
+    /* ===== SEÇÕES ===== */
+    .section-bg {
+      padding: 80px 0 90px;
+      position: relative;
+      transition: filter 0.6s ease;
+    }
+    .section-bg:nth-child(odd) {
+      clip-path: polygon(0 0, 100% 0, 100% 98%, 0 100%);
+    }
+    .section-bg:nth-child(even) {
+      clip-path: polygon(0 2%, 100% 0, 100% 100%, 0 100%);
+    }
+    .bg-vermelho {
+      background: var(--vermelho);
+    }
+    .bg-laranja {
+      background: var(--laranja);
+    }
+    .bg-marrom {
+      background: var(--marrom);
+    }
+
+    .section-title {
+      font-family: var(--serif);
+      font-size: clamp(1.6rem, 4vw, 2.3rem);
+      font-weight: 600;
+      margin: 0 0 28px;
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      transition: all var(--transition);
+      cursor: default;
+      position: relative;
+    }
+    .section-title .num {
+      font-weight: 300;
+      opacity: 0.5;
+      font-size: 0.8em;
+    }
+    .section-title u {
+      text-decoration-thickness: 2px;
+      text-underline-offset: 10px;
+    }
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.5);
+      transition: width 0.6s ease;
+    }
+    .section-title:hover::after {
+      width: 100%;
+    }
+    .section-title:hover {
+      transform: scale(1.02);
+      letter-spacing: 0.5px;
+    }
+
+    p {
+      margin: 0 0 22px;
+      font-size: 1.05rem;
+      transition: all var(--transition);
+    }
+    p:last-child {
+      margin-bottom: 0;
+    }
+    p:hover {
+      transform: translateX(6px);
+      opacity: 0.92;
+    }
+    .lede p {
+      font-size: 1.12rem;
+    }
+    .closer {
+      text-decoration: underline;
+      text-underline-offset: 6px;
+      font-weight: 600;
+      transition: all var(--transition);
+      cursor: default;
+    }
+    .closer:hover {
+      opacity: 0.7;
+      letter-spacing: 0.5px;
+    }
+
+    /* ===== BLOCOS DE CITAÇÃO ===== */
+    blockquote {
+      margin: 44px 0;
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: clamp(1.3rem, 3.4vw, 1.9rem);
+      line-height: 1.4;
+      text-align: center;
+      padding: 36px 32px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      transition: all var(--transition);
+      cursor: default;
+      border-left: 4px solid rgba(255, 255, 255, 0.3);
+      position: relative;
+    }
+    blockquote::before {
+      content: '"';
+      font-size: 4rem;
+      position: absolute;
+      top: -10px;
+      left: 15px;
+      opacity: 0.2;
+      font-family: var(--serif);
+    }
+    blockquote:hover {
+      transform: scale(1.02) translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+      background: rgba(255, 255, 255, 0.15);
+    }
+    blockquote.box {
+      background: var(--laranja);
+      color: #fff;
+      border-left-color: #fff;
+    }
+    blockquote.box::before {
+      opacity: 0.15;
+    }
+    blockquote footer {
+      margin-top: 14px;
+      font-family: var(--sans);
+      font-style: normal;
+      font-size: 0.85rem;
+      opacity: 0.75;
+      text-align: right;
+    }
+
+    /* ===== FIGURAS ===== */
+    figure {
+      margin: 36px 0;
+      transition: all var(--transition);
+      cursor: default;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+    }
+    figure::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.1), transparent);
+      pointer-events: none;
+    }
+    figure:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 16px 50px rgba(0, 0, 0, 0.25);
+    }
+    figure img {
+      transition: all var(--transition);
+      filter: brightness(1);
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+    figure:hover img {
+      filter: brightness(1.06) contrast(1.02);
+      transform: scale(1.02);
+    }
+    figcaption {
+      font-size: 0.85rem;
+      opacity: 0.8;
+      margin-top: 12px;
+      font-style: italic;
+      padding: 0 4px;
+    }
+
+    /* ===== GRADE DE FOTOS ===== */
+    .grid-photos {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 36px 0;
+    }
+    .grid-photos .photo-item {
+      overflow: hidden;
+      border-radius: 8px;
+      transition: all var(--transition);
+      position: relative;
+    }
+    .grid-photos .photo-item::after {
+      content: '🔍';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      font-size: 2rem;
+      opacity: 0;
+      transition: all var(--transition);
+      pointer-events: none;
+      text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+    }
+    .grid-photos .photo-item:hover::after {
+      opacity: 0.8;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    .grid-photos img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      border-radius: 8px;
+      transition: all var(--transition);
+      cursor: pointer;
+    }
+    .grid-photos .photo-item:hover img {
+      transform: scale(1.08);
+      filter: brightness(1.1);
+    }
+
+    /* ===== GRÁFICO ===== */
+    .chart-card {
+      margin-top: 30px;
+      transition: all var(--transition);
+      padding: 20px 24px 24px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      backdrop-filter: blur(4px);
+    }
+    .chart-card:hover {
+      transform: translateY(-6px);
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    }
+    .chart-title {
+      font-weight: 700;
+      font-size: 1.05rem;
+      margin-bottom: 18px;
+    }
+    .legend {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: 6px;
+      float: right;
+      transition: all var(--transition);
+    }
+    .legend:hover {
+      transform: scale(1.05);
+    }
+    .legend .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #fff;
+      display: inline-block;
+      box-shadow: 0 2px 8px rgba(255, 255, 255, 0.3);
+    }
+    .chart-source {
+      text-align: right;
+      font-style: italic;
+      font-size: 0.85rem;
+      opacity: 0.8;
+      margin-top: 10px;
+    }
+
+    /* ===== MAPA ESTILIZADO ===== */
+    .map-card {
+      background: #1a1a2e;
+      padding: 12px;
+      border-radius: 16px;
+      margin: 36px 0;
+      transition: all var(--transition);
+      cursor: pointer;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+    }
+    .map-card:hover {
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+      transform: translateY(-6px) scale(1.01);
+    }
+    .map-frame {
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+      line-height: 0;
+      background: #2d4059;
+    }
+    .map-frame img {
+      border-radius: 10px;
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: all 0.6s ease;
+    }
+    .map-card:hover .map-frame img {
+      transform: scale(1.02);
+    }
+
+    .map-pin {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 48px;
+      height: 48px;
+      background: rgba(0, 0, 0, 0.75);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      backdrop-filter: blur(4px);
+      animation: pulse 2s ease-in-out infinite;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .map-compass {
+      position: absolute;
+      bottom: 80px;
+      right: 20px;
+      width: 42px;
+      height: 42px;
+      background: rgba(0, 0, 0, 0.75);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: transform 0.6s ease;
+    }
+    .map-card:hover .map-compass {
+      transform: rotate(180deg);
+    }
+    .map-zoom {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      width: 42px;
+      background: rgba(0, 0, 0, 0.75);
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .map-zoom span {
+      color: #fff;
+      text-align: center;
+      padding: 10px 0;
+      font-size: 1.2rem;
+      line-height: 1;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.2s ease;
+      cursor: pointer;
+      user-select: none;
+    }
+    .map-zoom span:last-child {
+      border-bottom: none;
+    }
+    .map-zoom span:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+    .map-zoom span:active {
+      transform: scale(0.9);
+    }
+    .map-footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.7));
+      color: #fff;
+      font-size: 0.7rem;
+      padding: 14px 16px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .map-google {
+      font-weight: 700;
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+    }
+    .map-legal {
+      opacity: 0.7;
+      font-size: 0.65rem;
+    }
+    .map-caption {
+      text-align: center;
+      font-style: italic;
+      font-weight: 600;
+      margin-top: 18px;
+      font-size: 0.95rem;
+      opacity: 0.9;
+      transition: all var(--transition);
+    }
+    .map-caption:hover {
+      opacity: 1;
+      transform: scale(1.01);
+    }
+
+    /* ===== RODAPÉ ===== */
+    footer.site-footer {
+      background: #0a0a0a;
+      color: #aaa;
+      font-size: 0.8rem;
+      padding: 24px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    footer.site-footer .wrap {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    footer.site-footer a {
+      color: #aaa;
+      text-decoration: none;
+      margin-right: 20px;
+      transition: all var(--transition);
+      position: relative;
+    }
+    footer.site-footer a::before {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0%;
+      height: 1.5px;
+      background: #aaa;
+      transition: width var(--transition);
+    }
+    footer.site-footer a:hover::before {
+      width: 100%;
+    }
+    footer.site-footer a:hover {
+      color: #fff;
+      letter-spacing: 0.3px;
+    }
+
+    /* ===== ELEMENTOS ADICIONAIS ===== */
+    .placeholder {
+      border: 1.5px dashed rgba(255, 255, 255, 0.4);
+      padding: 34px 20px;
+      text-align: center;
+      font-style: italic;
+      font-size: 0.95rem;
+      opacity: 0.85;
+      border-radius: 8px;
+      transition: all var(--transition);
+      cursor: default;
+      background: rgba(255, 255, 255, 0.04);
+    }
+    .placeholder:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateY(-3px);
+      border-color: rgba(255, 255, 255, 0.7);
+    }
+    .italic-block p {
+      font-style: italic;
+      font-size: 1.1rem;
+      line-height: 1.7;
+      padding: 8px 0;
+    }
+
+    /* ===== ANIMAÇÕES ===== */
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @keyframes pulse {
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 0.6;
+        transform: scale(0.95);
+      }
+    }
+    @keyframes float {
+      0%,
+      100% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+    @keyframes shimmer {
+      0% {
+        background-position: -200% 0;
+      }
+      100% {
+        background-position: 200% 0;
+      }
+    }
+
+    /* ===== RESPONSIVIDADE ===== */
+    @media (max-width: 768px) {
+      .hero-content {
+        grid-template-columns: 1fr;
+        gap: 24px;
+        padding-left: 22px;
+        padding-right: 22px;
+      }
+      .hero-text {
+        grid-column: 1 / 2;
+        grid-row: 2 / 3;
+      }
+      .hero-colagem {
+        grid-column: 1 / 2;
+        grid-row: 1 / 2;
+      }
+      .hero-colagem .placeholder {
+        min-height: 120px;
+        padding: 18px 14px;
+        font-size: 0.85rem;
+      }
+      .hero-inner {
+        padding: 60px 22px 30px;
+      }
+      .section-bg {
+        padding: 48px 0 60px;
+      }
+      .section-bg:nth-child(odd),
+      .section-bg:nth-child(even) {
+        clip-path: none;
+      }
+      .wrap {
+        padding: 0 22px;
+      }
+      .grid-photos {
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+      .grid-photos img {
+        height: 160px;
+      }
+      blockquote {
+        padding: 28px 20px;
+        font-size: clamp(1.1rem, 3vw, 1.5rem);
+      }
+      footer.site-footer .wrap {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      .nav-float {
+        bottom: 20px;
+        right: 16px;
+        gap: 10px;
+      }
+      .nav-btn {
+        padding: 10px 16px;
+        font-size: 0.7rem;
+      }
+      .nav-btn .label {
+        display: none;
+      }
+      .nav-btn .shortcut {
+        display: none;
+      }
+      .nav-indicator {
+        font-size: 0.6rem;
+        padding: 4px 12px;
+      }
+      .read-mode-toggle {
+        top: 12px;
+        right: 12px;
+        width: 38px;
+        height: 38px;
+        font-size: 1rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .grid-photos {
+        grid-template-columns: 1fr;
+      }
+      .grid-photos img {
+        height: 200px;
+      }
+      .hero-title {
+        font-size: clamp(2.5rem, 12vw, 3.5rem);
+      }
+      .hero-eyebrow {
+        font-size: clamp(1.5rem, 6vw, 2.2rem);
+      }
+      .chart-card {
+        padding: 16px;
+      }
+      .map-card {
+        padding: 8px;
+      }
+      .map-pin,
+      .map-compass,
+      .map-zoom {
+        transform: scale(0.8);
+        transform-origin: top right;
+      }
+    }
+
+    /* ===== REVELAÇÃO AO SCROLL ===== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(35px);
+      transition: all 0.8s cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 {
+      transition-delay: 0.1s;
+    }
+    .reveal-delay-2 {
+      transition-delay: 0.2s;
+    }
+    .reveal-delay-3 {
+      transition-delay: 0.3s;
+    }
+    .reveal-delay-4 {
+      transition-delay: 0.4s;
+    }
+
+    /* ===== SCROLL INDICATOR ===== */
+    .scroll-hint {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      animation: float 2.5s ease-in-out infinite;
+    }
+    .scroll-hint .arrow {
+      font-size: 1.5rem;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== BARRA DE PROGRESSO ===== -->
+  <div class="progress-bar" id="progressBar"></div>
+
+  <!-- ===== BOTÃO MODO LEITURA ===== -->
+  <button class="read-mode-toggle" id="readModeToggle" aria-label="Ativar modo de leitura" title="Modo Leitura (foco no texto)">
+    📖
+  </button>
+
+  <!-- ===== NAVEGAÇÃO FLUTUANTE ===== -->
+  <nav class="nav-float" aria-label="Navegação da reportagem">
+    <div class="nav-indicator">
+      Seção <span id="currentSection">1</span> de <span id="totalSections">4</span>
+    </div>
+    <button class="nav-btn" id="nextSectionBtn" aria-label="Próxima seção">
+      <span class="icon">⬇</span>
+      <span class="label">Próxima seção</span>
+      <span class="shortcut">⌘↓</span>
+    </button>
+    <button class="nav-btn" id="topBtn" aria-label="Voltar ao topo" style="padding: 10px 16px;">
+      <span class="icon">↑</span>
+      <span class="label">Topo</span>
+    </button>
+  </nav>
+
+  <!-- ============ HERO ============ -->
+  <header class="hero" id="hero">
+    <svg class="hero-map" viewBox="0 0 900 520" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 90 C 60 60, 90 140, 60 190 C 30 240, 90 280, 70 340 C 50 400, 110 430, 90 520" stroke="#7fd0ff" stroke-width="5" fill="none" opacity=".7"/>
+      <g stroke="#ffffff" stroke-width="1" opacity=".35" fill="none">
+        <path d="M40 0 L120 80 L260 40 L340 130 L500 70 L620 160 L760 90 L900 180"/>
+        <path d="M0 200 L160 230 L300 190 L460 260 L600 220 L760 290 L900 250"/>
+        <path d="M0 340 L150 360 L320 320 L480 400 L640 350 L800 420 L900 380"/>
+        <path d="M120 0 L140 520 M260 0 L300 520 M420 0 L380 520 M580 0 L620 520 M740 0 L700 520"/>
+        <rect x="600" y="60" width="260" height="180" />
+        <rect x="630" y="90" width="60" height="40"/>
+        <rect x="700" y="90" width="60" height="40"/>
+        <rect x="770" y="90" width="60" height="40"/>
+        <rect x="630" y="140" width="60" height="40"/>
+        <rect x="700" y="140" width="60" height="40"/>
+        <rect x="770" y="140" width="60" height="40"/>
+      </g>
+    </svg>
+
+    <div class="hero-inner">
+      <p class="hero-eyebrow">cuiabá</p>
+      <h1 class="hero-title">
+        cidade <span class="highlight">ilegal</span>
+      </h1>
+      <span class="hero-sub">reportagem experimental sobre direito à moradia</span>
+    </div>
+
+    <div class="hero-content">
+      <div class="hero-colagem">
+        <div class="placeholder">
+          🏚️<br><br>
+          [ colagem com: ônibus, anúncios de aluguel,<br>
+          e imagens que marcaram esse momento ]
+        </div>
+      </div>
+      <div class="hero-text lede">
+        <p class="section-title" style="margin-bottom:18px;">Introdução</p>
+        <p>Cheguei a Cuiabá fugindo de uma casa que não era bem um lar e a primeira impressão foi de que não conseguiria viver nessa cidade.</p>
+        <p>Me senti perdida ao tentar pegar um ônibus, no tumulto da Prainha, às 18h de uma segunda-feira. Quando enfim cheguei na kitnet minúscula que eu chamei de casa por três anos, tive a sorte de chorar no colo de um amigo que me acalmou.</p>
+        <p>E felizmente, no dia seguinte, descobri mais um e logo outro amigo que tornaram Cuiabá minha casa e que me fizeram admirar o mais belo dessa terra: o seu povo.</p>
+        <p>Nesta cidade aprendi a dizer e eu tinha muito a dizer. Falava sem parar porque as palavras me sufocavam.</p>
+        <p>Uma criança antes sem palavras, agora de olhos marejados no centro de uma cidade que parecia muito maior do que era. Era palavra-lágrima numa cidade-rio que tinha recém me acolhido. Com o tempo, fui percebendo que essa cidade era, na verdade, uma senhora cheia de contrastes.</p>
+        <p>Que tem o sol queimando a pele de seu povo, mas também a chuva torrencial de fevereiro. Que ao mesmo tempo é o calor do asfalto quente e o frescor da água gelada do Coxipó do Ouro.</p>
+        <p>Cuiabá me mostrou o cuidado com o outro, mas também a fronteira entre a rua e o muro alto de condomínio. O amor do acolhimento, mas também o desconforto da desigualdade.</p>
+        <p>A terra que acolhe pau-rodado, mas que exclui os seus filhos indesejados. E é nessa cidade-contraste, nesse ódio e amor dos seus contornos que seu povo pulsa vida e vontade de viver.</p>
+        <p class="closer">E é sobre essa velha senhora que eu quero te contar.</p>
+      </div>
+    </div>
+
+    <div class="scroll-hint">
+      <span class="arrow">⌄</span>
+      role para explorar
+    </div>
+  </header>
+
+  <!-- ============ 1. UMA CIDADE REFÚGIO ============ -->
+  <section class="section-bg bg-laranja" id="section1" data-section="1">
+    <div class="wrap">
+      <h2 class="section-title reveal"><span class="num">1.</span><u>Uma cidade refúgio</u></h2>
+
+      <p class="reveal reveal-delay-1">Banhada pelas águas do Rio Cuiabá, filho do exuberante e caudaloso Rio Paraguai, a capital de Mato Grosso nasceu no centro de um continente mergulhado em milagres e tragédias.</p>
+
+      <p class="reveal reveal-delay-1">Formada a partir de <em>comunidades ribeirinhas, quilombolas e os povos indígenas que sempre habitaram e construíram esse espaço</em>, Cuiabá denuncia em sua paisagem o que há de bom e vil neste estado de proporções gigantescas.</p>
+
+      <p class="reveal reveal-delay-2">Outrora esquecida pelas enormes distâncias entre o Centro Geodésico da América do Sul e as regiões mais populosas do Brasil, "[...] a sobrevivência de Cuiabá foi quase um milagre. Um fenômeno de resistência heroica ao isolamento e ao esquecimento de tantos governos." (Póvoas, Mato Grosso um convite à fortuna, 2022, p. 61).</p>
+
+      <p class="reveal reveal-delay-2">A partir da década de 1930, importantes mudanças facilitaram a chegada de "paus-rodados" à cidade, que cresceu de forma vertiginosa nas últimas décadas.</p>
+
+      <p class="reveal reveal-delay-3">Com a chegada de migrantes oriundos do campo e de diferentes regiões do país, Cuiabá saltou de aproximadamente 100 mil habitantes (1970) para 650 mil em 2022, de acordo com o último censo do Instituto Brasileiro de Geografia e Estatística (IBGE).</p>
+
+      <div class="chart-card reveal reveal-delay-3">
+        <div class="legend"><span class="dot"></span>Cuiabá</div>
+        <p class="chart-title">População Cuiabá (MT) em milhares de habitantes</p>
+        <svg viewBox="0 0 760 320" width="100%" style="overflow:visible;font-family:var(--sans);">
+          <g stroke="rgba(255,255,255,.35)" stroke-width="1">
+            <line x1="70" y1="20"  x2="760" y2="20"/>
+            <line x1="70" y1="70"  x2="760" y2="70"/>
+            <line x1="70" y1="120" x2="760" y2="120"/>
+            <line x1="70" y1="170" x2="760" y2="170"/>
+            <line x1="70" y1="220" x2="760" y2="220"/>
+            <line x1="70" y1="270" x2="760" y2="270"/>
+          </g>
+          <g fill="#fff" font-size="15" font-weight="700" text-anchor="end">
+            <text x="55" y="25">700</text>
+            <text x="55" y="75">600</text>
+            <text x="55" y="125">500</text>
+            <text x="55" y="175">400</text>
+            <text x="55" y="225">300</text>
+            <text x="55" y="270">200</text>
+          </g>
+          <polyline points="100,245 220,165 340,95 470,75 600,55 740,28"
+          fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <g fill="#fff">
+            <circle cx="100" cy="245" r="4"/>
+            <circle cx="220" cy="165" r="4"/>
+            <circle cx="340" cy="95" r="4"/>
+            <circle cx="470" cy="75" r="4"/>
+            <circle cx="600" cy="55" r="4"/>
+            <circle cx="740" cy="28" r="4"/>
+          </g>
+          <g fill="#fff" font-size="15" font-weight="700" text-anchor="middle">
+            <text x="100" y="300">1970</text>
+            <text x="220" y="300">1980</text>
+            <text x="340" y="300">1991</text>
+            <text x="470" y="300">2000</text>
+            <text x="600" y="300">2010</text>
+            <text x="740" y="300">2022</text>
+          </g>
+        </svg>
+        <p class="chart-source">Fonte: IBGE</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ EMIDIO 1 ============ -->
+  <section class="section-bg bg-vermelho" id="section2" data-section="2">
+    <div class="wrap">
+      <p class="reveal">O quilombola Emidio de Souza também chegou a Cuiabá nesta época. Natural de Chapada dos Guimarães, Emidio nasceu na Comunidade Quilombola Barro Preto Serra do Cambam Bi, no distrito de Água Fria, mas aos 10 anos de idade foi expulso do local com seus pais e irmãos, além de outras 13 famílias. Em 1975, o Governo do Estado permitiu que a área onde moravam fosse utilizada por terceiros e determinou a retirada das famílias do local.</p>
+
+      <figure class="reveal reveal-delay-1">
+        <img src="" alt="Imagem placeholder - Emidio de Souza">
+        <figcaption>Emidio de Souza, líder quilombola.</figcaption>
+      </figure>
+    </div>
+
+    <div class="wrap" style="padding-top:6px;">
+      <blockquote class="box reveal reveal-delay-2">
+        "Como surpresa, eles receberam visita de 15 jagunços e um avião passando por cima. E os jagunços com engenheiro de topografia e agrimensura, avisando cada família de meu pai que tinha 30 dias para sair das terras onde os nossos antepassados viviam há mais de 200 anos", contou Emidio.
+      </blockquote>
+    </div>
+
+    <div class="wrap" style="padding-top:6px;">
+      <p class="reveal" style="font-style:italic;">Em 2009, trinta e quatro anos após a expulsão de Emidio e sua família, a Comunidade Quilombola Barro Preto Serra do Camba Bi foi reconhecida pela Fundação Palmares.</p>
+
+      <figure class="reveal reveal-delay-1">
+        <img src="" alt="Imagem placeholder - Comunidade Quilombola">
+        <figcaption>Comunidade Quilombola Barro Preto Serra do Camba Bi.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ============ MARROM - DITADURA ============ -->
+  <section class="section-bg bg-marrom" id="section3" data-section="3">
+    <div class="wrap">
+      <p class="reveal">Assim como para Emidio, milhares de pessoas tiveram a sua chegada a Cuiabá envolta em muita violência, em um período sombrio para a história brasileira que foi a Ditadura Militar (1964-1985).</p>
+
+      <p class="reveal reveal-delay-1">Para a pesquisadora Cristina Soares, o regime militar não foi apenas o plano de fundo do aumento populacional de Cuiabá, mas um dos principais motores para a ocupação desse território no centro do Brasil. Sem fazer a Reforma Agrária, os militares se utilizaram de propaganda para prometer a centenas de milhares de famílias um recomeço em Mato Grosso.</p>
+
+      <figure class="reveal reveal-delay-2">
+        <img src="" alt="Imagem placeholder - Propaganda da Ditadura Militar">
+        <figcaption>Propaganda do regime militar sobre a ocupação da Amazônia.</figcaption>
+      </figure>
+
+      <div class="placeholder reveal reveal-delay-3">
+        [Recuperar Fotos da propaganda durante o regime militar sobre a ocupação da Amazônia (Revista Manchete, livro Mato Grosso um convite à riqueza).]
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 2. CUIABÁ CIDADE ILEGAL ============ -->
+  <section class="section-bg bg-laranja" id="section4" data-section="4">
+    <div class="wrap">
+      <h2 class="section-title reveal"><span class="num">2.</span><u>Cuiabá: cidade ilegal</u></h2>
+
+      <p class="reveal reveal-delay-1">Ao chegar em Cuiabá, Emidio passou a morar no bairro Morada do Sol, em uma casa alugada que dividia com 11 pessoas e se mudou alguns anos depois para o loteamento Novo Paraíso, mas ainda sem uma casa própria.</p>
+
+      <p class="reveal reveal-delay-1">Em fevereiro de 92, os moradores do Novo Paraíso se organizaram em assembleia e deliberaram pela ampliação do bairro com a ocupação do assentamento que viria a se tornar o Novo Paraíso II. A ocupação mobilizou 2.100 famílias e Emidio foi um dos líderes do movimento.</p>
+
+      <p class="reveal reveal-delay-2">"A responsabilidade aumentou e confesso que não foi fácil. Coordenar um assentamento, com liminar, no segundo dia já tinha uma liminar de despejo. Mas a gente conseguiu com a habilidade de fazer as negociações e intervenção política, a gente conseguiu sentar na mesa de negociação", disse Emidio.</p>
+
+      <p class="reveal reveal-delay-2">Nesse período, a Associação Comunitária de Habitação do Estado de Mato Grosso (ACDHAM) foi criada para organizar o movimento de ocupação do Novo Paraíso II e uma manifestação pela regulamentação da área.</p>
+
+      <p class="reveal reveal-delay-3">O ato aconteceu em 1994 em frente ao Comando Geral da Polícia para que o então governador Jaime Campos assinasse o decreto de desapropriação por interesse social e contou com 1.600 pessoas, segundo Emídio.</p>
+
+      <p class="reveal reveal-delay-3">"Aí fizemos essa grande mobilização na rua com faixa e cartaz, fechamos a frente do Comando-Geral, ninguém entrava e ninguém saía mais do Comando-Geral da Polícia ali no meu bairro [Novo Paraíso]. Na época eu me lembro que o Jaime Campos colocou um tenente coronel nessa manifestação louco para prender o líder, que seria eu Emídio, mas aí a gente conseguiu mediar a situação".</p>
+
+      <p class="reveal reveal-delay-4">Depois da pressão popular, o então governador Jaime Campos assinou o decreto de desapropriação, mas algumas residências até hoje ainda não foram regularizadas.</p>
+
+      <p class="reveal reveal-delay-4">O Novo Paraíso II é um exemplo, mas a maior parcela dos bairros de Cuiabá surgiram a partir de ocupações irregulares, fruto da ausência de políticas públicas de habitação popular.</p>
+
+      <p class="reveal reveal-delay-4">Nesse contexto, o processo de urbanização afastou a cidade da lógica ribeirinha, marcada pela relação com os rios, de onde provinham o alimento e o sustento da população, e passou a reproduzir a dicotomia entre os espaços considerados "legais" e "ilegais".</p>
+
+      <div class="map-card reveal reveal-delay-3">
+        <div class="map-frame">
+          <img src="https://placehold.co/900x400/2d4059/ffffff?text=Mapa+de+Cuiabá" alt="Mapa de Cuiabá">
+          <div class="map-pin">📍</div>
+          <div class="map-compass">🧭</div>
+          <div class="map-zoom">
+            <span>+</span>
+            <span>−</span>
+          </div>
+          <div class="map-footer">
+            <span class="map-google">Google</span>
+            <span class="map-legal">Atalhos do teclado &nbsp;©&nbsp;2026 Google&nbsp; Termos&nbsp; Informar um problema</span>
+          </div>
+        </div>
+      </div>
+      <p class="map-caption reveal">Veja as mudanças do bairro entre 2011, 2019 e 2024.</p>
+
+      <p class="reveal reveal-delay-1">A arquiteta e urbanista Ermínia Maricato chama de "cidade ilegal" a parcela da cidade produzida fora da legalidade fundiária, geralmente marcada pela negligência do poder público e pela ausência de políticas capazes de garantir moradia, infraestrutura e direitos à maior parte da população formada por negros e pobres. Cuiabá reproduziu esse modelo de urbanização comum às cidades brasileiras, no qual a ausência programada de políticas públicas atinge principalmente essa população.</p>
+    </div>
+  </section>
+
+  <!-- ============ VERMELHO - bolsões ============ -->
+  <section class="section-bg bg-vermelho" id="section5" data-section="5">
+    <div class="wrap">
+      <p class="reveal">A pesquisadora e geóloga Anna Garção evidencia que, com o crescimento populacional, o processo de urbanização de Cuiabá passou a se aproximar do modelo das grandes cidades. Como consequência, a população mais pobre foi sendo deslocada para o que ela chamou de "bolsões de ocupação ilegal" às margens da cidade.</p>
+
+      <p class="reveal reveal-delay-1">"No princípio, a ocupação original de Cuiabá era sob a perspectiva atual ilegal, porque era justamente nas áreas onde o rio poderia chegar na cheia, na época que as águas subiam bastante. Então, a cidade nasceu ilegal e foi se legalizando para os ricos, mas as pessoas que não têm condição foram sempre jogadas para as margens".</p>
+
+      <p class="reveal reveal-delay-2">No entanto, esse processo se tornou ainda mais desigual quando essas mesmas margens passam a ser disputadas também por condomínios fechados e empreendimentos imobiliários. Assim, mesmo as populações que já haviam sido deslocadas para áreas periféricas, acabaram sendo empurradas ainda mais para longe, para regiões mais pobres e com menos infraestrutura.</p>
+
+      <p class="reveal reveal-delay-2">"Então é uma deficiência habitacional muito grave, observada no Brasil inteiro e invariavelmente. Então aquele processo de uso, ocupação e produção do espaço que era próprio de Cuiabá, que era próprio dos ribeirinhos, que era uma coisa regional, foi aos poucos se adaptando com a modalidade global, com a metropolização".</p>
+
+      <p class="reveal reveal-delay-3">Bairros do centro de Cuiabá como o Porto, Baú e Araés, construídos historicamente pela população negra da cidade, evidenciam essas mudanças, como chamou a atenção a historiadora Cristina Soares.</p>
+
+      <p class="reveal reveal-delay-3">"Você encontra algumas pessoas com ascendência indígena e negra no Baú, mas são poucas pessoas. Porque o espaço ele vai sendo tomado. Essa população que está ali no centro vai sendo jogada para a periferia, para o grilo, para nada. Porque a gente sabe, no processo de pós-abolição, não houve uma política de reparação para essa população negra. Mas coloca a população lá para dizer: Você não pertence à cidade. Você tem que ser jogado, excluído desse centro. Porque você não pertence".</p>
+
+      <p class="reveal reveal-delay-4">Para o griô Cristóvão Luiz Gonçalves da Silva, organizador da Rota da Ancestralidade, o processo de exclusão da população negra não é associado somente à habitação em Cuiabá, mas também à falta de reconhecimento da própria memória da cidade e a contribuição dessa população.</p>
+
+      <p class="reveal reveal-delay-4">Ele cita como exemplo a Praça da Mãe Preta, na Prainha, onde viveu Ana Benedita das Neves, mulher negra, lavadeira e cozinheira e que dá nome ao local.<br>
+      "Ali era, pode-se dizer, um quilombo urbano. Mas onde estão os familiares dessas pessoas que moraram ali? A quem pertence hoje aquela espacialidade, aquele território onde esses ancestrais africanos viveram?".</p>
+
+      <p class="reveal reveal-delay-4">Outro local que representa a história negra de Cuiabá, mas que a população negra não consegue mais acessar hoje é o Quilombo da Mãe Bonifácia, onde está localizado um dos bairros mais caros da cidade.</p>
+
+      <blockquote class="reveal reveal-delay-3">
+        "Quem é que trafega, quem é que navega, quem é que vive hoje no Parque Mãe Bonifácia? Se vocês quiserem fazer uma roda de samba, levar os instrumentos para lá, pode? Não pode. Então, você tem um espaço negro, negro sem espaço", afirmou.
+        <footer>— Cristóvão Luiz Gonçalves da Silva</footer>
+      </blockquote>
+
+      <figure class="reveal reveal-delay-2">
+        <img src="" alt="Imagem placeholder - Parque Mãe Bonifácia">
+        <figcaption>Parque Mãe Bonifácia, um espaço de memória negra em Cuiabá.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ============ 3. OCUPAR PARA (RE)EXISTIR ============ -->
+  <section class="section-bg bg-laranja" id="section6" data-section="6">
+    <div class="wrap">
+      <h2 class="section-title reveal"><span class="num">3.</span><u>Ocupar para (re)existir</u></h2>
+
+      <p class="reveal reveal-delay-1">As ocupações não estão registradas apenas no passado de Cuiabá, mas fazem parte do tempo presente de uma parcela da população que ainda luta pelo direito à moradia, como Mayara Fabiano e seus três filhos que estão entre as famílias moradoras das ocupações localizadas na região da Avenida do Contorno Leste.</p>
+
+      <figure class="reveal reveal-delay-2">
+        <img src="" alt="Imagem placeholder - Ocupação Contorno Leste">
+        <figcaption>Ocupação na região da Avenida do Contorno Leste, em Cuiabá.</figcaption>
+      </figure>
+
+      <p class="reveal reveal-delay-1">May, como prefere ser chamada, encontrou na ocupação uma saída para conquistar a casa própria após o divórcio, já que anteriormente morava aos fundos da casa de sua sogra e nunca tinha conseguido ser beneficiada por programas de moradia como o Minha Casa, Minha Vida ou pelo Ser Família Habitação.</p>
+
+      <p class="reveal reveal-delay-2">No início de 2023, ela soube do movimento a partir de amigos e resolveu também fazer parte da ocupação.</p>
+
+      <p class="reveal reveal-delay-2">Mesmo com a insegurança do processo de reintegração de posse e também as dificuldades de residir em um local que conta com infraestruturas improvisadas para o acesso à água e energia, ela conta com a esperança de conquistar a casa própria e o espírito de comunidade que construiu ali com seus vizinhos.</p>
+
+      <p class="reveal reveal-delay-3">"Um amigo meu cortou as madeiras, nós fizemos uns paletes. Recebi as doações de um tio com a porta que eu tenho. Então, tipo assim, cada um me ajudou um pouquinho por saber que eu estava aqui na luta sozinha. Então, graças a Deus, tive anjos na minha vida que ajudaram muito aqui na construção do meu barraquinho. Aqui era só uma peça e eu tinha feito a arinha e eu decidi fechar."</p>
+
+      <div class="grid-photos reveal reveal-delay-3">
+        <div class="photo-item"><img src="https://placehold.co/400x300/a0522d/ffffff?text=Foto+1" alt="Foto da ocupação 1"></div>
+        <div class="photo-item"><img src="https://placehold.co/400x300/a0522d/ffffff?text=Foto+2" alt="Foto da ocupação 2"></div>
+        <div class="photo-item"><img src="https://placehold.co/400x300/a0522d/ffffff?text=Foto+3" alt="Foto da ocupação 3"></div>
+        <div class="photo-item"><img src="https://placehold.co/400x300/a0522d/ffffff?text=Foto+4" alt="Foto da ocupação 4"></div>
+      </div>
+
+      <p class="reveal reveal-delay-1">O advogado Daniel Ramalho representa a Mayara e outras 2.500 famílias que residem nas ocupações Jardim Esperança 1, Jardim Esperança 2, Flor do Leste, Residencial Contorno Leste 1, Residencial Contorno Leste 2 e Vila Verde e que enfrentam um processo de despejo atualmente paralisado pelo Supremo Tribunal Federal (STF).</p>
+
+      <p class="reveal reveal-delay-2">A ordem de despejo foi suspensa pela Justiça devido ao não cumprimento de requisitos previstos na ADPF (Arguição de Descumprimento de Preceito Fundamental) 828 do Supremo Tribunal Federal (STF), responsável pela suspensão de despejos durante o período da pandemia.</p>
+
+      <p class="reveal reveal-delay-2">Entre os requisitos não cumpridos estão audiências de conciliação e a realização de relatórios socioeconômicos adequados. Portanto, o STF decidiu por suspender a medida judicial e atualmente as famílias e os proprietários da área se encontram em processo de conciliação, já que a Prefeitura de Cuiabá manifestou interesse em desapropriar a área.</p>
+
+      <p class="reveal reveal-delay-3">"A Constituição Federal brasileira garante direito à moradia e ela preserva o direito de propriedade, ou seja, ela trata o direito à propriedade com muita seriedade. Aquelas pessoas que são proprietárias daquelas terras têm escritura, têm a matrícula, não podem ser retiradas dessa propriedade. Mas a mesma Constituição Federal também autoriza a desapropriação para fins sociais. Então, nesse caso, eu acredito que essas pessoas vão ficar no Contorno do Leste se tudo ocorrer conforme o planejado pelo município".</p>
+
+      <p class="reveal reveal-delay-3">"Então eu entendo que se as pessoas estão lá, se elas foram para lá, é porque verdadeiramente elas não tinham alternativa ou estavam prestes a serem despejadas do aluguel, estavam preocupados, não tinham para onde ir e foram para aquele local. E a maior parte das pessoas são mulheres. Porque qualquer ser humano que tenha condição de dar um lar, um ar-condicionado para o seu filho, um banheiro limpinho, não vai se submeter a morar por anos naquele local, apenas pelo bel prazer de ganhar um lote, como alguns dizem".</p>
+
+      <p class="reveal reveal-delay-4">A legislação de Cuiabá se transformou na última década com o objetivo de reprimir novas ocupações na capital, como as ocupações do Contorno Leste. Em 2016, o então prefeito de Cuiabá e ex-governador de Mato Grosso, Mauro Mendes, sancionou a lei municipal de nº 6100 que proíbe a instalação de energia elétrica, água e esgoto em áreas caracterizadas como loteamentos clandestinos.</p>
+
+      <p class="reveal reveal-delay-4">De acordo com essa legislação, é considerado loteamento clandestino "aquele decorrente de assentamento informal, inclusive o decorrente de invasão em áreas públicas ou privadas, ou de loteamento ou desmembramento não aprovado pelo Poder Público Municipal". Na prática, essa legislação teve como principal objetivo sufocar iniciativas de ocupação irregular de territórios da capital mato-grossense.</p>
+    </div>
+  </section>
+
+  <!-- ============ 4. ROTAS PARA UM FUTURO ANCESTRAL ============ -->
+  <section class="section-bg bg-marrom" id="section7" data-section="7">
+    <div class="wrap">
+      <h2 class="section-title reveal"><span class="num">4.</span><u>Rotas para um futuro ancestral</u></h2>
+      <div class="italic-block reveal reveal-delay-1">
+        <p>Por fim, a última retranca, de título "Rotas para um futuro ancestral" está sendo desenvolvida para evidenciar iniciativas de resistência na ocupação de uma cidade gerida para esquecer sua própria memória e seu povo. Com trechos das entrevistas de Cristóvão e Adriana de Oliveira (do projeto Psicanálise na Rua).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RODAPÉ ============ -->
+  <footer class="site-footer">
+    <div class="wrap">
+      <div>
+        <a href="#">Condições e suporte</a>
+        <a href="#">Política de Privacidade</a>
+      </div>
+      <div>Criado com o Canva</div>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      'use strict';
+
+      // ===== VARIÁVEIS =====
+      const sections = document.querySelectorAll('.section-bg');
+      const totalSections = sections.length;
+      const progressBar = document.getElementById('progressBar');
+      const currentSectionSpan = document.getElementById('currentSection');
+      const totalSectionsSpan = document.getElementById('totalSections');
+      const nextBtn = document.getElementById('nextSectionBtn');
+      const topBtn = document.getElementById('topBtn');
+      const readModeToggle = document.getElementById('readModeToggle');
+
+      // ===== CONTADOR DE SEÇÕES =====
+      totalSectionsSpan.textContent = totalSections;
+
+      // ===== BARRA DE PROGRESSO =====
+      function updateProgress() {
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+        progressBar.style.width = progress + '%';
+
+        // Atualiza indicador de seção
+        let currentSection = 1;
+        sections.forEach((section, index) => {
+          const rect = section.getBoundingClientRect();
+          if (rect.top <= window.innerHeight / 2) {
+            currentSection = index + 1;
+          }
+        });
+        currentSectionSpan.textContent = currentSection;
+      }
+
+      window.addEventListener('scroll', updateProgress);
+      window.addEventListener('resize', updateProgress);
+      updateProgress();
+
+      // ===== PRÓXIMA SEÇÃO =====
+      function goToNextSection() {
+        let currentSectionIndex = 0;
+        sections.forEach((section, index) => {
+          const rect = section.getBoundingClientRect();
+          if (rect.top <= window.innerHeight / 2) {
+            currentSectionIndex = index;
+          }
+        });
+
+        const nextIndex = Math.min(currentSectionIndex + 1, sections.length - 1);
+        const targetSection = sections[nextIndex];
+        if (targetSection) {
+          targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+
+      nextBtn.addEventListener('click', goToNextSection);
+
+      // ===== VOLTAR AO TOPO =====
+      topBtn.addEventListener('click', function() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+
+      // ===== TECLADO =====
+      document.addEventListener('keydown', function(e) {
+        // Ctrl + ↓ ou Cmd + ↓
+        if ((e.ctrlKey || e.metaKey) && e.key === 'ArrowDown') {
+          e.preventDefault();
+          goToNextSection();
+        }
+        // Ctrl + ↑ ou Cmd + ↑
+        if ((e.ctrlKey || e.metaKey) && e.key === 'ArrowUp') {
+          e.preventDefault();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        // Tecla 'r' para modo leitura
+        if (e.key === 'r' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+          e.preventDefault();
+          readModeToggle.click();
+        }
+      });
+
+      // ===== MODO LEITURA =====
+      let isReadMode = false;
+      readModeToggle.addEventListener('click', function() {
+        isReadMode = !isReadMode;
+        document.body.classList.toggle('read-mode', isReadMode);
+        this.classList.toggle('active', isReadMode);
+        this.textContent = isReadMode ? '☀️' : '📖';
+        this.setAttribute('aria-label', isReadMode ? 'Desativar modo de leitura' : 'Ativar modo de leitura');
+      });
+
+      // ===== REVELAÇÃO AO SCROLL (Intersection Observer) =====
+      const revealElements = document.querySelectorAll('.reveal');
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, {
+        threshold: 0.12,
+        rootMargin: '0px 0px -30px 0px'
+      });
+
+      revealElements.forEach(el => {
+        observer.observe(el);
+      });
+
+      // ===== PARALLAX NO HERO =====
+      const heroMap = document.querySelector('.hero-map');
+      if (heroMap) {
+        window.addEventListener('scroll', function() {
+          const scrollY = window.scrollY;
+          const heroSection = document.querySelector('.hero');
+          if (heroSection) {
+            const heroHeight = heroSection.offsetHeight;
+            if (scrollY < heroHeight) {
+              heroMap.style.transform = `translateY(${scrollY * 0.15}px)`;
+            }
+          }
+        });
+      }
+
+      // ===== INTERATIVIDADE DO MAPA =====
+      const mapCard = document.querySelector('.map-card');
+      if (mapCard) {
+        mapCard.addEventListener('click', function(e) {
+          if (!e.target.closest('.map-zoom')) {
+            this.style.transition = 'transform 0.15s ease';
+            this.style.transform = 'scale(0.98)';
+            setTimeout(() => {
+              this.style.transform = '';
+            }, 150);
+          }
+        });
+      }
+
+      // ===== ZOOM DO MAPA =====
+      document.querySelectorAll('.map-zoom span').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          this.style.background = 'rgba(255,255,255,0.25)';
+          setTimeout(() => {
+            this.style.background = '';
+          }, 200);
+
+          // Feedback visual
+          const action = this.textContent.trim() === '+' ? 'Aumentando zoom' : 'Diminuindo zoom';
+          const feedback = document.createElement('div');
+          feedback.textContent = action;
+          feedback.style.cssText = `
+                position: fixed;
+                bottom: 100px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(0,0,0,0.7);
+                color: #fff;
+                padding: 8px 20px;
+                border-radius: 30px;
+                font-size: 0.8rem;
+                font-family: Inter, sans-serif;
+                z-index: 9999;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                backdrop-filter: blur(8px);
+                pointer-events: none;
+              `;
+          document.body.appendChild(feedback);
+          setTimeout(() => feedback.style.opacity = '1', 10);
+          setTimeout(() => {
+            feedback.style.opacity = '0';
+            setTimeout(() => feedback.remove(), 400);
+          }, 1200);
+        });
+      });
+
+      // ===== EFEITO NOS ITEMS DA GALERIA =====
+      document.querySelectorAll('.photo-item').forEach(item => {
+        item.addEventListener('click', function() {
+          const img = this.querySelector('img');
+          if (img) {
+            const src = img.src;
+            // Simula uma visualização em tamanho maior
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                  position: fixed;
+                  inset: 0;
+                  background: rgba(0,0,0,0.85);
+                  z-index: 9999;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  cursor: pointer;
+                  backdrop-filter: blur(8px);
+                  animation: fadeIn 0.3s ease;
+                `;
+            const imgClone = document.createElement('img');
+            imgClone.src = src;
+            imgClone.style.cssText = `
+                  max-width: 85vw;
+                  max-height: 85vh;
+                  border-radius: 12px;
+                  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+                  animation: fadeInUp 0.4s ease;
+                `;
+            overlay.appendChild(imgClone);
+            document.body.appendChild(overlay);
+
+            overlay.addEventListener('click', function() {
+              overlay.style.opacity = '0';
+              setTimeout(() => overlay.remove(), 300);
+            });
+
+            // Fechar com ESC
+            const closeHandler = function(e) {
+              if (e.key === 'Escape') {
+                overlay.click();
+                document.removeEventListener('keydown', closeHandler);
+              }
+            };
+            document.addEventListener('keydown', closeHandler);
+          }
+        });
+      });
+
+      // ===== INJECT STYLES FOR OVERLAY =====
+      const styleSheet = document.createElement('style');
+      styleSheet.textContent = `
+            @keyframes fadeIn {
+              from { opacity: 0; }
+              to { opacity: 1; }
+            }
+            @keyframes fadeInUp {
+              from { opacity: 0; transform: translateY(30px) scale(0.95); }
+              to { opacity: 1; transform: translateY(0) scale(1); }
+            }
+          `;
+      document.head.appendChild(styleSheet);
+
+      // ===== SCROLL HINT =====
+      const scrollHint = document.querySelector('.scroll-hint');
+      if (scrollHint) {
+        let hintHidden = false;
+        window.addEventListener('scroll', function() {
+          if (window.scrollY > 100 && !hintHidden) {
+            hintHidden = true;
+            scrollHint.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            scrollHint.style.opacity = '0';
+            scrollHint.style.transform = 'translateX(-50%) translateY(-20px)';
+          }
+        });
+      }
+
+      console.log('📰 Reportagem "Cuiabá Cidade Ilegal" carregada');
+      console.log('📌 Atalhos: Ctrl+↓ próxima seção | Ctrl+↑ topo | R modo leitura');
+    });
+  </script>
+
+</body>
+</html>
